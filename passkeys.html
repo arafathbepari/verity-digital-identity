@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a17">
+  <meta name="description" content="Try privacy-preserving passkey verification for a sample online transaction.">
+  <title>Passkey transaction demo — Verity</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#17231f;background:#f7f8f4;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0;line-height:1.55}.shell{width:min(100% - 36px,900px);margin:auto}.top{background:#101a17;color:#fff;padding:18px 0}.brand{color:#fff;text-decoration:none;font-weight:800;font-size:20px}.brand b{color:#b7f36b}.top small{float:right;color:#c5d0ca;margin-top:5px}.main{padding:60px 0}.eyebrow{color:#5d8c32;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h1{font-size:clamp(34px,6vw,56px);line-height:1.05;letter-spacing:-.045em;margin:12px 0 16px}.intro{max-width:680px;color:#66736d}.notice{background:#edf5e6;border:1px solid #d6e8c6;border-radius:12px;padding:14px 16px;margin:26px 0;color:#35452c;font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}.card{background:#fff;border:1px solid #dfe7e1;border-radius:18px;padding:24px;box-shadow:0 12px 36px #17231f0b}.card h2{font-size:21px;margin:0 0 7px}.card p{color:#66736d;font-size:14px;margin:0 0 20px}.transaction{background:#f7f8f4;border-radius:12px;padding:14px;margin-bottom:18px}.transaction span{display:block;color:#66736d;font-size:12px}.transaction strong{font-size:16px}.field{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}input{width:100%;border:1px solid #cbd6ce;border-radius:10px;padding:12px;font:inherit}button{border:0;border-radius:999px;background:#17231f;color:#fff;padding:12px 18px;font:700 14px inherit;cursor:pointer;width:100%;margin-top:12px}button:hover{background:#30483d}button:disabled{opacity:.55;cursor:wait}.status{min-height:44px;margin:16px 0 0;padding:11px 12px;border-radius:10px;background:#f2f4f1;color:#53615a;font-size:13px}.status[data-kind=success]{background:#edf5e6;color:#304b20}.status[data-kind=error]{background:#fff0ee;color:#8a3026}.fine{color:#77827c;font-size:12px;margin-top:22px}.back{display:inline-block;color:#476a33;font-size:14px;font-weight:700;margin-top:26px}@media(max-width:650px){.main{padding:38px 0}.grid{grid-template-columns:1fr}.top small{display:none}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="shell"><a class="brand" href="/">✳ verity<b>.</b></a><small>Privacy-first passkey demo</small></div></header>
+  <main class="shell main">
+    <span class="eyebrow">Device-based authentication</span>
+    <h1>Approve a transaction<br>without sharing biometrics.</h1>
+    <p class="intro">Create a passkey on this site, then use it to approve a fixed sample purchase. Your device may ask for Face ID, Touch ID, a screen lock, or another passkey method. The website receives a cryptographic proof—not your face or fingerprint.</p>
+    <div class="notice"><strong>Demo only:</strong> This page does not verify legal identity, contact a payment provider, or charge money. The sample transaction details are fixed on the server. Use a test account and never enter an ID, password, or biometric data here.</div>
+    <div class="grid">
+      <section class="card" aria-labelledby="register-title">
+        <h2 id="register-title">1. Register a passkey</h2>
+        <p>Use an email address as a demo account label. Registration does not prove that you own that email or establish your legal identity.</p>
+        <label class="field" for="register-email">Demo account email</label>
+        <input id="register-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button id="register-button" type="button">Create passkey</button>
+        <div class="status" id="register-status" role="status" aria-live="polite">Your biometric remains on your device.</div>
+      </section>
+      <section class="card" aria-labelledby="approve-title">
+        <h2 id="approve-title">2. Approve sample purchase</h2>
+        <p>Review the server-defined details, then authenticate with a passkey registered for this demo account.</p>
+        <div class="transaction"><span>Merchant · Verity Demo Shop</span><strong>USD $24.00</strong><span>Sample order · DEMO-1042</span></div>
+        <label class="field" for="login-email">Demo account email</label>
+        <input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button id="approve-button" type="button">Verify and approve sample</button>
+        <div class="status" id="approve-status" role="status" aria-live="polite">No transaction will be charged.</div>
+      </section>
+    </div>
+    <p class="fine">Passkeys use WebAuthn and require HTTPS (localhost is allowed for development). A production transaction service also needs a payment backend, fraud controls, recovery procedures, privacy/legal review, and monitoring.</p>
+    <a class="back" href="/">← Back to Verity</a>
+  </main>
+  <script type="module">
+    import { startRegistration, startAuthentication, browserSupportsWebAuthn } from 'https://esm.sh/@simplewebauthn/browser@13.1.2';
+
+    const api = (name) => `/.netlify/functions/${name}`;
+    const emailInput = (id) => document.getElementById(id).value.trim().toLowerCase();
+    const status = (id, message, kind = '') => {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.dataset.kind = kind;
+    };
+    async function post(name, data) {
+      const response = await fetch(api(name), {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || 'The request could not be completed.');
+      return body;
+    }
+    function errorMessage(error) {
+      if (error?.name === 'NotAllowedError') return 'The passkey request was cancelled or timed out.';
+      return error?.message || 'Something went wrong. Please try again.';
+    }
+    if (!browserSupportsWebAuthn()) {
+      status('register-status', 'This browser does not support passkeys.', 'error');
+      status('approve-status', 'This browser does not support passkeys.', 'error');
+    }
+    document.getElementById('register-button').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const email = emailInput('register-email');
+      if (!email) return status('register-status', 'Enter a valid email address to use as a demo account label.', 'error');
+      button.disabled = true;
+      status('register-status', 'Preparing secure registration…');
+      try {
+        const { options } = await post('passkey-register-options', { email });
+        const response = await startRegistration({ optionsJSON: options });
+        const result = await post('passkey-register-verify', { response });
+        status('register-status', result.message, 'success');
+        document.getElementById('login-email').value = email;
+      } catch (error) {
+        status('register-status', errorMessage(error), 'error');
+      } finally { button.disabled = false; }
+    });
+    document.getElementById('approve-button').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const email = emailInput('login-email');
+      if (!email) return status('approve-status', 'Enter the email label used when registering this demo passkey.', 'error');
+      button.disabled = true;
+      status('approve-status', 'Preparing the sample transaction challenge…');
+      try {
+        const { options } = await post('passkey-auth-options', { email });
+        const response = await startAuthentication({ optionsJSON: options });
+        const result = await post('passkey-auth-verify', { response });
+        status('approve-status', `${result.message} ${result.transaction.merchant} · ${result.transaction.amount} · ${result.transaction.reference}. No payment was made.`, 'success');
+      } catch (error) {
+        status('approve-status', errorMessage(error), 'error');
+      } finally { button.disabled = false; }
+    });
+  </script>
+</body>
+</html>
