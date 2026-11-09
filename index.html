@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A privacy-first digital identity verification platform.">
+  <title>Verity | Digital Identity Verification</title>
+  <style>
+    :root {
+      --bg: #f4faf6;
+      --panel: #ffffff;
+      --ink: #11231d;
+      --muted: #586b64;
+      --primary: #1c7a5c;
+      --primary-dark: #145942;
+      --line: #dfeae3;
+      --soft: #edf7f1;
+      --shadow: 0 18px 50px rgba(18,42,31,0.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
+      color: var(--ink);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; }
+    .container { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 0;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -0.04em; font-size: 1.22rem;
+    }
+    .brand-mark {
+      display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--primary); color: white; font-size: 0.95rem;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 22px; color: var(--muted); font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 12px; padding: 14px 20px; font-weight: 700; cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .btn.primary {
+      background: var(--primary); color: white; box-shadow: 0 12px 24px rgba(28, 122, 92, 0.2);
+    }
+    .btn.primary:hover { background: var(--primary-dark); }
+    .btn.secondary {
+      background: white; color: var(--primary); border: 1px solid var(--line);
+    }
+    .hero {
+      display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 48px; align-items: center; padding: 80px 0 56px;
+    }
+    .eyebrow {
+      display: inline-block; padding: 7px 10px; border-radius: 999px; background: var(--soft); color: var(--primary); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    h1 {
+      margin: 18px 0 18px; font-size: clamp(2.8rem, 5vw, 5rem); line-height: 0.96; letter-spacing: -0.06em;
+    }
+    .lead {
+      margin: 0; max-width: 600px; color: var(--muted); font-size: 1.12rem;
+    }
+    .cta-row {
+      display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px;
+    }
+    .mini-note {
+      margin-top: 18px; color: var(--muted); font-size: 0.9rem;
+    }
+    .demo-card {
+      border: 1px solid var(--line); border-radius: 26px; background: linear-gradient(145deg, #f7fbf8, #ffffff 45%);
+      box-shadow: var(--shadow); padding: 24px;
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;
+    }
+    .status-pill {
+      font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 10px; border-radius: 999px; background: var(--soft); color: var(--primary);
+    }
+    .shield {
+      display: grid; place-items: center; width: 96px; height: 96px; margin: 18px auto 16px; border-radius: 50%; background: var(--soft); color: var(--primary); font-size: 2.4rem;
+    }
+    .demo-title { text-align: center; margin: 0; font-size: 1.35rem; }
+    .demo-sub { text-align: center; color: var(--muted); margin: 8px 0 18px; }
+    .check-list {
+      display: grid; gap: 12px;
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 12px; background: white; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 0.95rem;
+    }
+    .check-bullet {
+      width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); color: var(--primary); font-weight: 800;
+    }
+    section { padding: 72px 0; }
+    .soft { background: #f7faf8; }
+    .section-heading { max-width: 680px; margin-bottom: 32px; }
+    .section-heading h2 {
+      margin: 10px 0 12px; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.06em; line-height: 1.04;
+    }
+    .section-heading p { margin: 0; color: var(--muted); max-width: 620px; }
+    .feature-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .feature-card {
+      background: white; border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: 0 10px 25px rgba(16, 34, 26, 0.02);
+    }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px; background: var(--soft); display: grid; place-items: center; font-size: 1.4rem;
+    }
+    .feature-card h3 { font-size: 1.1rem; margin: 18px 0 8px; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: 0.96rem; }
+    .privacy-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; background: var(--ink); color: white; border-radius: 20px; padding: 28px 30px; margin-top: 32px;
+    }
+    .privacy-banner h3 {
+      margin: 0 0 6px; font-size: clamp(1.5rem, 2.8vw, 2.2rem); letter-spacing: -0.05em;
+    }
+    .privacy-banner p { margin: 0; color: rgba(255,255,255,0.7); }
+    #status {
+      min-height: 1.5em; margin-top: 18px; color: var(--primary); font-weight: 700;
+    }
+    footer {
+      padding: 28px 0 50px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); margin-top: 18px;
+    }
+    .footer-row { display: flex; justify-content: space-between; gap: 18px; align-items: center; }
+    @media (max-width: 840px) {
+      .hero { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .privacy-banner, .footer-row { flex-direction: column; align-items: flex-start; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <nav>
+        <a class="brand" href="#top" aria-label="Verity home">
+          <span class="brand-mark">V</span>
+          <span>verity</span>
+        </a>
+        <div class="nav-links">
+          <a href="#how">How it works</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#security">Security</a>
+          <a class="btn primary" href="#how">Get started</a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <main id="top">
+    <div class="container">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <span class="eyebrow">Digital identity verification</span>
+          <h1 id="hero-title">Verify people securely.<br>Protect their privacy.</h1>
+          <p class="lead">A secure identity system for online transactions built around consent, data minimization, privacy protection, and trusted verification workflows.</p>
+          <div class="cta-row">
+            <a class="btn primary" href="#how">Explore the system</a>
+            <a class="btn secondary" href="#privacy">Privacy principles</a>
+          </div>
+          <p class="mini-note">Prototype concept site only — no biometric or personal data is collected here.</p>
+        </div>
+
+        <div class="demo-card" aria-label="Example identity verification panel">
+          <div class="card-header">
+            <strong>Verification status</strong>
+            <span class="status-pill">Secure</span>
+          </div>
+          <div class="shield" aria-hidden="true">✦</div>
+          <h2 class="demo-title">Trusted identity</h2>
+          <p class="demo-sub">Designed for online trust and transaction safety.</p>
+          <div class="check-list">
+            <div class="check-item"><span class="check-bullet">✓</span> Consent-based verification</div>
+            <div class="check-item"><span class="check-bullet">✓</span> Minimal data sharing</div>
+            <div class="check-item"><span class="check-bullet">✓</span> Encryption and secure storage</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section id="how" class="soft">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">How it works</span>
+          <h2>Built for trust, not friction.</h2>
+          <p>Identity verification should protect users without making online transactions feel invasive or overwhelming.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">◎</div>
+            <h3>Identity proofing</h3>
+            <p>Verify identity by combining trusted credentials, step-up checks, and risk-aware decision rules.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">△</div>
+            <h3>Secure matching</h3>
+            <p>Use privacy-preserving matching methods and strong authentication to reduce fraud without over-collecting data.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">◈</div>
+            <h3>Transaction approval</h3>
+            <p>Confirm risk thresholds, support step-up verification, and create an auditable transaction record.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Privacy by design</span>
+          <h2>Protect identity data with clear boundaries.</h2>
+          <p>Any serious biometric or identity verification system should be transparent about purpose, retention, consent, legal basis, and user control.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">▣</div>
+            <h3>Data minimization</h3>
+            <p>Collect only the specific identity attributes needed for the transaction and avoid excessive retention.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">⟡</div>
+            <h3>Consent-first UX</h3>
+            <p>Give users clear explanations, control over sharing, and easy ways to review or withdraw consent.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">⎈</div>
+            <h3>Retention controls</h3>
+            <p>Set tight retention periods, deletion workflows, and secure access policies for sensitive records.</p>
+          </article>
+        </div>
+
+        <div class="privacy-banner" id="security">
+          <div>
+            <h3>Biometric data demands exceptional care.</h3>
+            <p>When used, biometrics should be encrypted, access-limited, and subject to strict governance and legal review.</p>
+          </div>
+          <a class="btn primary" href="#top">Review the approach</a>
+        </div>
+        <p id="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <span>© 2026 Verity</span>
+      <span>Prototype site · No biometric data collection</span>
+    </div>
+  </footer>
+
+  <script>
+    const status = document.getElementById('status');
+    document.querySelectorAll('a[href="#top"], a[href="#how"], a[href="#privacy"], a[href="#security"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        status.textContent = 'This demonstration is informational only and does not process personal or biometric identity data.';
+      });
+    });
+  </script>
+</body>
+</html>
